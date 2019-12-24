@@ -1,0 +1,37 @@
+---
+
+- name: Backup all switches configuration
+  hosts: N9000v-All
+  gather_facts: no
+
+
+  tasks:
+  - name: Gather Facts
+    nxos_facts:
+      gather_subset:
+        - "all"
+
+  - name: Display the hostname and OS version of the switches
+    debug:
+      msg: "The hostname is {{ ansible_net_hostname }} and the OS is {{ ansible_net_version }}"
+
+  - name: Create backup direrctory per hostname, if it exists, no override is done (IDEMPOTENCY)
+    file:
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}"
+      state: directory
+      recurse: yes
+
+  - name: Backup switch (nxos), by default a backup directory is created in the root directory where playbook exists and configuration is backed up
+    nxos_config:
+      backup: yes
+    register: backup_nxos_location
+    when: ansible_network_os == 'nxos'
+
+  - name: Dump Output for backup_nxos_location to Terminal
+    debug:
+      var: backup_nxos_location  
+
+  - name: Copy backup files into /etc/ansible/Backup folder
+    copy:
+      src: "{{ backup_nxos_location.backup_path }}"
+      dest: "/etc/ansible/Backup/{{ ansible_net_hostname }}/{{ ansible_net_hostname }}.bck"

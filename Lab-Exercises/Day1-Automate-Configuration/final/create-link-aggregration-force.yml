@@ -1,0 +1,58 @@
+---
+
+- name: PLAY-1 Configure link aggregation for switch nx-osv9000-1
+  hosts: N9000v-1
+  gather_facts: no
+
+  tasks:
+  - name: Add interfaces to respective bundle
+    nxos_linkagg:
+      aggregate:
+        - { group: 100, members: Ethernet1/1 }
+        - { group: 103, members: Ethernet1/3 }
+        - { group: 104, members: Ethernet1/2 }
+      mode: active
+      force: yes
+      state: absent
+
+- name: PLAY2 Configure link aggregation for switch nx-osv9000-2
+  hosts: N9000v-2
+  gather_facts: no
+
+  tasks:
+  - name: Add interfaces to respective bundle
+    nxos_linkagg:
+      aggregate:
+        - { group: 100, members: Ethernet1/1 }
+        - { group: 103, members: Ethernet1/3 }
+        - { group: 104, members: Ethernet1/2 }
+      mode: active
+      force: yes
+      state: absent
+
+- name: PLAY-3 Configure link aggregation for switch nx-osv9000-3
+  hosts: N9000v-3
+  gather_facts: no
+
+  tasks:
+  - name: Add interfaces to respective bundle
+    nxos_linkagg:
+      aggregate:
+        - { group: 103, members: [Ethernet1/2, Ethernet1/3] }
+      mode: active
+      force: yes
+      state: absent
+
+- name: PLAY-4 Configure ling aggregation for switch nx-osv9000-4
+  hosts: N9000v-4
+  gather_facts: no
+
+  tasks:
+  - name: Add interfaces to respective bundle
+    nxos_linkagg:
+      aggregate:
+        - { group: 104, members: [Ethernet1/1, Ethernet1/3] }
+      mode: active
+      force: yes
+      state: absent
+

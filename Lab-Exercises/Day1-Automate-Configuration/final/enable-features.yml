@@ -1,0 +1,25 @@
+---
+
+- name: Enable features
+  hosts: N9000v-All
+  gather_facts: no
+
+  tasks:
+  - name: Module "nxos_feature" - Manage features in NX-OS switches
+    nxos_feature:
+      feature: "{{ item.feature }}"
+      state: "{{ item.state }}"
+
+    loop:
+      - feature: lacp
+        state: enabled
+      - feature: interface-vlan
+        state: enabled
+      - feature: hsrp
+        state: enabled
+      - feature: bash-shell
+        state: enabled
+      - feature: scp-server
+        state: enabled
+      - feature: ospf
+        state: enabled

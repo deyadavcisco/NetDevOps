@@ -1,0 +1,12 @@
+---
+
+- name: Vlan Provisioning
+  hosts: N9000v-Leaf
+  gather_facts: no
+
+  tasks:
+    - name: Remove VLAN's from database
+      nxos_vlan:
+        vlan_range: "2,20"
+        state: absent
+

@@ -1,0 +1,46 @@
+---
+
+- name: Switch Maintenance GIR module - Maintenance mode
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 400
+      host: "{{ inventory_hostname }}"
+
+  tasks:
+  - name: Copy file/patch from Ansible Controller to nx-osv9000-2
+    nxos_file_copy:
+      file_pull: no
+      local_file: "/home/ansible/lab-files/nxos.CSCvk55847-n9k_ALL-1.0.0-9.2.1.lib32_n9000.rpm"
+      remote_file: "nxos.CSCvk55847-n9k_ALL-1.0.0-9.2.1.lib32_n9000.rpm"
+
+  - name: Configure Maintenance mode parameters
+    nxos_config:
+      lines:
+        - system mode maintenance snapshot-delay 200
+      provider: "{{ provider }}"
+
+  - name: GIR-Bring switch in maintenance mode
+    nxos_gir:
+      system_mode_maintenance: true
+      provider: "{{ provider }}"
+
+  - name: GIR-Check System Status
+    nxos_command:
+      commands:
+        - show system mode
+        - show vpc role
+      wait_for:
+        - result[0].system_mode eq Maintenance
+        - result[1].vpc-peer-status eq vpc-shut-down
+      provider: "{{ provider }}"
+    register: system_output
+
+  - name: DUMP OUTPUT TO TERMINAL
+    debug:
+      var: system_output

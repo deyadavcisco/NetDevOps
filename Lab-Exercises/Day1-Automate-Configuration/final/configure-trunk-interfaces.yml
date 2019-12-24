@@ -1,0 +1,86 @@
+---
+
+- name: PLAY-1 Configure Layer2 interfaces as trunks for switches nx-osv9000-1 &  nx-osv9000-2
+  hosts: N9000v-VPC
+  gather_facts: no
+
+  tasks:
+  - name: Change mode to Layer2 for interfaces Ethernet1/1, Ethernet1/2 & Ethernet1/3
+    nxos_interface:
+      aggregate:
+        - { name: "Ethernet1/1" }
+        - { name: "Ethernet1/2" }
+        - { name: "Ethernet1/3" }
+      mode: layer2
+
+  - name: Configure Trunk interfaces Ethernet1/1, Ethernet1/2 & Ethernet1/3
+    nxos_l2_interface:
+      aggregate:
+        - { name: "Ethernet1/1" }
+        - { name: "Ethernet1/2" }
+        - { name: "Ethernet1/3" }
+      mode: trunk
+
+  - name: Use nxos_config module to add port-channels 100, 103 & 104 in trunk mode
+    nxos_config:
+      lines:
+        - switchport mode trunk
+      parents: "{{ item.parents }}"
+      
+    loop:
+      - parents: interface port-channel100
+      - parents: interface port-channel103
+      - parents: interface port-channel104
+
+- name: PLAY-2 Configure Layer2 network interfaces as trunks and edge as access ports for switches nx-osv9000-3
+  hosts: N9000v-3
+  gather_facts: no
+
+  tasks:
+  - name: Change mode to Layer2 for interfaces Ethernet1/2, Ethernet1/3 & Ethernet1/4
+    nxos_interface:
+      aggregate:
+        - { name: "Ethernet1/2" }
+        - { name: "Ethernet1/3" }
+        - { name: "Ethernet1/4" }
+      mode: layer2
+
+  - name: Configure interfaces Ethernet1/2 & Ethernet1/3 as trunk and Ethernet1/4 as access in VLAN 15
+    nxos_l2_interface:
+      aggregate:
+        - { name: "Ethernet1/2", mode: trunk }
+        - { name: "Ethernet1/3", mode: trunk }
+        - { name: "Ethernet1/4", mode: access, access_vlan: 15 }
+
+  - name: Use nxos_config module to add port-channel103 in trunk mode
+    nxos_config:
+      lines:
+        - switchport mode trunk
+      parents: interface port-channel103
+
+- name: PLAY-3 Configure Layer 2 network interfaces as trunks and edge as access ports for switches nx-osv9000-4
+  hosts: N9000v-4
+  gather_facts: no
+
+  tasks:
+  - name: Change mode to Layer2 for interfaces Ethernet1/1, Ethernet1/3 & Ethernet1/4
+    nxos_interface:
+      aggregate:
+        - { name: "Ethernet1/1" }
+        - { name: "Ethernet1/3" }
+        - { name: "Ethernet1/4" }
+      mode: layer2
+
+  - name: Configure interfaces Ethernet1/1 & Ethernet1/3 as trunk and Ethernet1/4 as access in VLAN 30
+    nxos_l2_interface:
+      aggregate:
+        - { name: "Ethernet1/1", mode: trunk }
+        - { name: "Ethernet1/3", mode: trunk }
+        - { name: "Ethernet1/4", mode: access, access_vlan: 30 }
+
+  - name: Use nxos_config module to add port-channel104 in trunk mode
+    nxos_config:
+      lines:
+        - switchport mode trunk
+      parents: interface port-channel104
+

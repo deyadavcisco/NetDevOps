@@ -1,0 +1,89 @@
+---
+
+- name: Switch Maintenance GIR module - Normal mode, Post Snapshot
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 400
+      host: "{{ inventory_hostname }}"
+
+  tasks:
+  - name: GIR-Bring switch out of maintenance mode - Normal Mode
+    nxos_gir:
+      system_mode_maintenance: FIXIT
+      provider: "{{ provider }}"
+
+# Pause for 2 minutes to let Control plane converge.
+  - pause:
+<INCOMPLETE>
+
+  - name: Gather Post Maintenance Facts
+    nxos_facts:
+      FIXIT:
+        - "all"
+    FIXIT: post_facts
+
+  - name: Display some of the collected facts
+    debug:
+      msg: "The hostname is {{ ansible_net_hostname }} and the OS is {{ ansible_net_version }}"
+
+  - name: Create backup dir per hostname, if it directory exists, no override is done (IDEMPOTENCY)
+    file:
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}"
+      state: directory
+      recurse: yes
+
+  - name: Copy Post maintenance facts into /etc/ansible/Backup/
+    copy:
+      content: "{{ FIXIT }}"
+      dest: "/etc/ansible/Backup/{{ ansible_net_hostname }}/{{ ansible_net_hostname }}-post-facts"
+    when: ansible_net_hostname == 'nx-osv9000-2'
+
+  - name: GIR-Create Post Snapshot and save it locally
+    nxos_snapshot:
+      action: FIXIT
+      snapshot_name: post_snapshot
+      description: Done with Ansible
+      save_snapshot_locally: FIXIT
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}/"
+      provider: "{{ provider }}"
+
+  - name: GIR-Check System Status
+    nxos_command:
+      FIXIT:
+        - show system mode
+        - show vpc role
+      FIXIT:
+        - result[0].system_mode eq Normal
+        - result[1].vpc-peer-status eq peer-ok
+      provider: "{{ provider }}"
+    register: system_output
+
+  - name: DUMP System Outputs to TERMINAL
+    debug:
+      var: system_output
+
+  - name: GIR-Compare Snapshots and save it locally
+    nxos_snapshot:
+      action: FIXIT
+      snapshot1: pre_snapshot
+      snapshot2: post_snapshot
+      comparison_results_file: FIXIT
+      compare_option: summary
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}/"
+      provider: "{{ provider }}"
+
+  - name: GIR-Collect Snapshot Summary
+    nxos_command:
+      commands:
+        - show snapshots compare pre_snapshot post_snapshot summary
+      provider: "{{ provider }}"
+    register: snapshot_summary
+
+  - name: DUMP Snapshot Summary to TERMINAL
+<INCOMPLETE>

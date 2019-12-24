@@ -1,0 +1,22 @@
+---
+
+- name: Vlan Provisioning
+  hosts: N9000v-All
+  gather_facts: no
+
+  tasks:
+    - name: CREATE VLANS AND ASSIGN A NAME USING VLAN_ID
+      nxos_vlan:
+        vlan_id: "{{ item.vlan_id }}"
+        name: "{{ item.name }}"
+        state: present
+
+      loop:
+        - vlan_id: 2
+          name: Native
+        - vlan_id: 15
+          name: Web
+        - vlan_id: 20
+          name: Apps
+        - vlan_id: 30
+          name: DataBase

@@ -1,0 +1,11 @@
+---
+
+- name: Streaming Telemtry Integration
+  hosts: N9000v-VPC
+  gather_facts: no 
+
+  tasks:
+  - name: Configuration to be taken from external file
+    nxos_config: 
+      src: telemetry.cfg
+      save_when: modified

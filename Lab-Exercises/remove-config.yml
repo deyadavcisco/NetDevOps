@@ -1,0 +1,58 @@
+---
+
+- name: Disable features
+  hosts: N9000v-All
+  gather_facts: no
+
+  tasks:
+  - name: Use nxos_config module to remove channel-group from interfaces
+    nxos_config:
+      lines: "{{ item.lines }}"
+      parents: "{{ item.parents }}"
+
+    loop:
+      - lines: no channel-group
+        parents: interface Ethernet1/1-3 
+
+  - name: Configure port-channel interfaces
+    nxos_interface:
+      aggregate:
+      - name: port-channel100
+      - name: port-channel103
+      - name: port-channel104
+      state: absent
+
+  - name: Change mode to Layer3 for interfaces Ethernet1/1-4
+    nxos_interface:
+      aggregate:
+        - { name: "Ethernet1/1" }
+        - { name: "Ethernet1/2" }
+        - { name: "Ethernet1/3" }
+        - { name: "Ethernet1/4" }
+      mode: layer3
+
+  - name: Module "nxos_feature" - Manage features in NX-OS switches
+    nxos_feature:
+      feature: "{{ item.feature }}"
+      state: "{{ item.state }}"
+
+    loop:
+      - feature: vpc
+        state: disabled    
+      - feature: lacp
+        state: disabled
+      - feature: hsrp
+        state: disabled
+      - feature: interface-vlan
+        state: disabled
+      - feature: bash-shell
+        state: disabled
+      - feature: scp-server
+        state: disabled
+      - feature: nxapi
+        state: disabled
+
+  - name: Remove VLAN's from database
+    nxos_vlan:
+      vlan_range: "2,15,20,30"
+      state: absent

@@ -1,0 +1,61 @@
+---
+
+- name: Switch Maintenance GIR module - Maintenance mode
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    rpm_patch: nxos.CSCvk55847-n9k_ALL-1.0.0-9.2.1.lib32_n9000.rpm
+    nxos_ver: 9.2(1)
+    nxos_hostname: nx-osv9000-2
+
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 200
+      host: "{{ inventory_hostname }}"
+
+
+  tasks:
+  - name: Gather Facts
+    nxos_facts:
+      gather_subset:
+        - "!config"
+        - "!hardware"
+        - "!interfaces"
+      provider: "{{ provider }}"
+
+  - name: Print Switch hostname and NXOS version on terminal
+    debug:
+      msg: "Switch {{ ansible_net_hostname }} is currently running version {{ ansible_net_version }}"
+
+  - name: Validate NX-OS version and install patch when required
+    debug:
+      msg: "Patching will be performed post validation, patch name: {{ rpm_patch }}"
+    changed_when: True
+    when: (ansible_net_version == nxos_ver and ansible_net_hostname == nxos_hostname)
+    notify:
+      - Install SMU on N9k
+      - Check installed patches
+      - DUMP OUTPUT TO TERMINAL
+
+  handlers:
+    - name: Install SMU on N9k
+      check_mode: no
+      nxos_rpm:
+        pkg: "{{ rpm_patch }}"
+        state: present
+        provider: "{{ provider }}"  
+
+    - name: Check installed patches
+      nxos_command:
+        commands: ['show install patches']
+        wait_for:
+          - result[0].TABLE_smu_list.ROW_smu_list.install_smu_id eq nxos.CSCvk55847-n9k_ALL-1.0.0-9.2.1.lib32_n9000
+        provider: "{{ provider }}"  
+      register: output 
+
+    - name: DUMP OUTPUT TO TERMINAL
+      debug:
+        var: output

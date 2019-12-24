@@ -1,0 +1,91 @@
+---
+
+- name: PLAY-1 Create SVI's for VLAN 150 and 30 on VPC switches nx-osv9000-1 & nx-osv9000-2
+  hosts: N9000v-VPC
+  gather_facts: no
+
+  tasks:
+  - name: Add SVI's for VLAN 15 and 30
+    nxos_interface:
+      aggregate:
+        - { name: Vlan15, description: L3-Interface VLAN 15 }
+        - { name: Vlan30, description: L3-Interface VLAN 30 }
+      state: present
+      admin_state: up
+
+  - name: Gather Basic Facts using subset excluding config, hardware and interfaces information
+    nxos_facts:
+      gather_subset:
+        - "!config"
+        - "!hardware"
+        - "!interfaces"
+
+  - name: DUMP Variable ansible_net_hostname to print the hostname for both switches
+    debug:
+      var: FIXIT
+
+  - name: Run this block only for switch nx-osv9000-1
+    debug:
+      msg: "Hostname validation will be performed"
+    changed_when: True
+    when: ansible_net_hostname == "nx-osv9000-1"
+    notify:
+      - Configure SVIs for switch nx-osv9000-1
+      - Configure HSRP for switch nx-osv9000-1
+
+  - name: Run this block only for switch nx-osv9000-2
+    debug:
+      msg: "Hostname validation will be performed"
+    changed_when: FIXIT
+    when: ansible_net_hostname == "FIXIT"
+    notify:
+<INCOMPLETE>
+
+
+  handlers:
+    - name: Configure SVIs for switch nx-osv9000-1
+      nxos_config:
+        lines: "{{ item.lines }}"
+        parents: "{{ item.parents }}"
+
+      loop:
+        - lines: ip address 192.168.15.251/24
+          parents: interface Vlan15
+        - lines: ip address 192.168.30.251/24
+          parents: interface Vlan30
+
+    - name: Configure HSRP for switch nx-osv9000-1
+      nxos_hsrp:
+        group: "{{ item.group }}"
+        vip: "{{ item.vip }}"
+        priority: "{{ item.priority }}"
+        interface: "{{ item.interface }}"
+        state: "{{ item.state }}"
+
+      loop:
+        - { group: 15, vip: 192.168.15.1, priority: 150, interface: vlan15, state: present }
+        - { group: 30, vip: 192.168.30.1, priority: 150, interface: vlan30, state: present }
+
+    - name: Configure SVIs for switch nx-osv9000-2
+      nxos_config:
+        lines: "{{ item.FIXIT }}"
+        parents: "{{ item.parents }}"
+
+      loop:
+        - lines: ip address 192.168.15.252/24
+          parents: interface Vlan15
+        - lines: ip address 192.168.30.252/24
+          FIXIT: interface Vlan30
+
+    - name: Configure HSRP for switch nx-osv9000-2
+      nxos_hsrp:
+        group: "{{ item.FIXIT }}"
+        vip: "{{ item.FIXIT }}"
+        priority: "{{ item.FIXIT }}"
+        interface: "{{ item.FIXIT }}"
+        state: "{{ item.state }}"
+
+      loop:
+        - { group: 15, vip: 192.168.15.1, priority: 110, interface: vlan15, state: present }
+        - { group: 30, vip: 192.168.30.1, priority: 110, interface: vlan30, state: present }
+

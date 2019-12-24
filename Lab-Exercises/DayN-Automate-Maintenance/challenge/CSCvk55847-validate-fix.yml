@@ -1,0 +1,47 @@
+---
+
+- name: Validate bug CSCvk55847 fix
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 400
+      host: "{{ inventory_hostname }}"
+
+
+  tasks:
+  - name: Gather Basic Facts using subset excluding config, hardware and interfaces information
+    nxos_facts:
+      gather_subset:
+        - "!config"
+        - "!hardware"
+        - "!interfaces"
+      provider: "{{ provider }}"
+
+  - name: DUMP Variable ansible_net_hostname to print the hostname of the switch
+    debug:
+      var: ansible_net_hostname
+
+  - name: Use nxos_config module to add static route and remove them
+    nxos_config:
+      lines:
+        -  ip route 10.1.1.0/24 Vlan100 192.168.1.1
+        -  ip route 10.1.2.0/24 Vlan100 192.168.1.1
+        -  no ip route 10.1.1.0/24 Vlan100 192.168.1.1
+        -  no ip route 10.1.2.0/24 Vlan100 192.168.1.1
+      provider: "{{ provider }}"  
+
+  - name: Run show ip route to validate routes for
+    nxos_command:
+      commands:
+        - show ip route
+      provider: "{{ provider }}"  
+    register: CLI_Output
+
+  - name: Display the command output
+    debug:
+      var: CLI_Output

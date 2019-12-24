@@ -1,0 +1,29 @@
+---
+
+- name: Switch Maintenance - VALIDATIONS, BACKUP and SNAPSHOTS
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 400
+      host: "{{ inventory_hostname }}"
+
+  tasks:
+  - name: Run custom CLI's
+    nxos_command:
+      commands:
+        - show vpc role
+        - show interface port-channel100
+      wait_for:
+        - result[0].vpc-current-role eq secondary
+        - result[1].TABLE_interface.ROW_interface.state eq up
+      provider: "{{ provider }}"
+    register: cli_output
+
+  - name: Dump Output to Terminal
+    debug:
+      var: cli_output.stdout

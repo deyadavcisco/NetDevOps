@@ -1,0 +1,22 @@
+---
+
+- name: Configure Static Route 
+  hosts: N9000v-VPC
+  gather_facts: no
+
+  tasks:
+  - name: Configure Static Default Route
+    nxos_static_route:
+      prefix: "0.0.0.0/0"
+      next_hop: "Vlan15"
+      route_name: Default
+
+  - name: Run custom CLI's and register output in a variable
+    nxos_command:
+      commands:
+        - show ip route 0.0.0.0/0 | json
+    register: cli_output
+
+  - name: Print output for variable
+    debug:
+      var: cli_output

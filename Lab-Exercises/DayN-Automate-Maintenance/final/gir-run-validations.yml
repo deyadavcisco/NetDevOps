@@ -1,0 +1,92 @@
+---
+
+- name: Switch Maintenance - VALIDATIONS, BACKUP and SNAPSHOTS
+  hosts: N9000v-2
+  gather_facts: no
+
+  vars:
+    provider:
+      username: "{{ usname }}"
+      password: "{{ pwd }}"
+      transport: nxapi
+      timeout: 400
+      host: "{{ inventory_hostname }}"
+
+  tasks:
+  - name: Gather Facts
+    nxos_facts:
+      gather_subset:
+        - "all"
+    register: pre_facts
+
+  - name: Display some facts
+    debug:
+      msg: "The hostname is {{ ansible_net_hostname }} and the OS is {{ ansible_net_version }}"
+
+  - name: Create backup dir per hostname, if it directory exists, no override is done (IDEMPOTENCY)
+    file:
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}"
+      state: directory
+      recurse: yes
+
+  - name: Copy facts into /etc/ansible/Backup/
+    copy:
+      content: "{{ pre_facts }}"
+      dest: "/etc/ansible/Backup/{{ ansible_net_hostname }}/{{ ansible_net_hostname }}-pre-facts"
+    when: ansible_net_hostname == 'nx-osv9000-2'
+
+  - name: Run custom CLI's
+    nxos_command:
+      commands:
+        - show vpc role
+        - show interface Ethernet1/1
+
+      wait_for:
+        - result[0].vpc-current-role eq secondary
+        - result[1].TABLE_interface.ROW_interface.state eq up
+
+      provider: "{{ provider }}"
+    register: cli_output
+
+  - name: Dump cli_output to Terminal
+    debug:
+      var: cli_output.stdout
+
+  - name: Backup switch (nxos), by default a backup directory is created in the root directory where playbook exists and configuration is backed up
+    nxos_config:
+      backup: yes
+    register: backup_nxos_location
+    when: ansible_network_os == 'nxos'
+
+  - name: Dump Output for backup_nxos_location to Terminal
+    debug:
+      var: backup_nxos_location  
+
+  - name: Copy backup files into /etc/ansible/Backup folder
+    copy:
+      src: "{{ backup_nxos_location.backup_path }}"
+      dest: "/etc/ansible/Backup/{{ ansible_net_hostname }}/{{ ansible_net_hostname }}-gir.bck"
+    when: ansible_net_hostname == 'nx-osv9000-2'
+
+  - name: Add show commands for custom snapshots creation
+    nxos_snapshot:
+      action: "{{ item.action }}"
+      section: "{{ item.section }}"
+      show_command: "{{ item.show_command }}"
+      row_id: "{{ item.row_id }}"
+      element_key1: "{{ item.element_key1 }}"
+      provider: "{{ provider }}"
+      
+    loop:
+      - { action: add, section: show-ip-int-bri-vrf-all, show_command: show ip interface brief vrf all, row_id: ROW_intf, element_key1: intf-name }
+      - { action: add, section: show-mac-address, show_command: show mac address-table, row_id: ROW_mac_address, element_key1: disp_mac_addr }
+
+  - name: Create Snapshot and Save a copy locally
+    nxos_snapshot:
+      action: create
+      snapshot_name: pre_snapshot
+      description: Done with Ansible
+      save_snapshot_locally: true
+      path: "/etc/ansible/Backup/{{ ansible_net_hostname }}/"
+      provider: "{{ provider }}"
+

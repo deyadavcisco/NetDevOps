@@ -1,0 +1,12 @@
+---
+
+- name: Enable NX-API
+  hosts: N9000v-All
+  gather_facts: no
+
+  tasks:
+  - name: Module to enable NX-API on switch is "nxos_nxapi"
+    nxos_nxapi:
+      state: present
+      http: yes
+      https: yes

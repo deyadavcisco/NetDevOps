@@ -1,0 +1,17 @@
+---
+
+- name: Run arbitary commands on the switches 
+  hosts: N9000v-All
+  gather_facts: no
+
+  tasks:
+  - name: Run custom CLI's and register output in a variable
+    nxos_command:
+      commands:
+        - show vlan | json
+        - show interface trunk | json
+    register: cli_output
+
+  - name: Print output for variable
+    debug:
+      var: cli_output

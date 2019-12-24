@@ -1,0 +1,81 @@
+---
+
+- name: PLAY-1 Build VPC Domain between nx-osv9000-1 & nx-osv9000-2
+  hosts: N9000v-VPC
+  gather_facts: no
+
+  tasks:
+  - name: Enable VPC feature
+    nxos_feature:
+      feature: vpc
+      state: enabled
+
+  - name: Configure VPC Domain ID 100
+    nxos_vpc:
+      domain: FIXIT
+      system_priority: 5000
+      peer_gw: true
+      auto_recovery: true
+      delay_restore: 180
+
+  - name: Configure port-channel interfaces
+    nxos_interface:
+      aggregate:
+      - name: port-channel100
+      - name: port-channel103
+      - name: port-channel104
+      state: present
+      mode: layer2
+
+- name: PLAY-2 Configure VPC peer-keepalive, role-priority, peer-link & vpc's exclusive for nx-osv9000-1
+  hosts: N9000v-1
+  gather_facts: no
+
+  tasks:
+  - name: Configure VPC peer-keepalive and role-priority
+    nxos_vpc:
+      domain: 100
+      pkl_dest: 198.18.1.32
+      pkl_src: 198.18.1.31
+      role_priority: 1000
+
+  - name: Configure port-channel 100 as Peer-Link
+    nxos_vpc_interface:
+      portchannel: 100
+      peer_link: true
+
+  - name: Configure port-channel 103 and 104 as VPC
+    nxos_vpc_interface:
+      portchannel: "{{ item.portchannel }}"
+      vpc: "{{ item.vpc }}"
+
+    loop:
+      - portchannel: 103
+        vpc: 103
+      - portchannel: 104
+        vpc: 104
+
+- name: PLAY-3 Configure VPC peer-keepalive, role-priority, peer-link & vpc's exclusive for nx-osv9000-2
+  hosts: N9000v-2
+  gather_facts: no
+
+  tasks:
+  - name: Configure VPC peer-keepalive and role-priority
+    nxos_vpc:
+      domain: 100
+      pkl_dest: 198.18.1.31
+      pkl_src: 198.18.1.32
+      role_priority: 2000
+
+  - name: Configure port-channel 100 as Peer-Link
+    nxos_vpc_interface:
+      portchannel: FIXIT
+      peer_link: FIXIT
+
+  - name: Configure port-channel 103 and 104 as VPC
+    nxos_vpc_interface:
+      portchannel: "{{ item.FIXIT }}"
+      vpc: "{{ item.FIXIT }}"
+
+    loop:
+<INCOMPLETE>
