@@ -163,6 +163,7 @@ Step 3. Explore Kibana configuration and visualization options
 [Task 6] Adding supervisor’s Mgmt0 info to the Dashboard (Optional)	
 
 
+
 Section 4: Day N - Automate Maintenance
 
 Objective 
