@@ -39,8 +39,7 @@ o	final - completed lab exercises: /home/ansible/lab-files/Day1-Automate-Configu
 
 o	challenges - solved challenges: /home/ansible/lab-files/Day1-Automate-Configuration/challenges
 
-•	The playbook in some tasks is left incomplete denoted by <INCOMPLETE> for completion or have to be replaced with an appropriate value indicated by keyword FIXIT.
-
+•	The playbook in some tasks is left incomplete denoted by INCOMPLETE for completion or have to be replaced with an appropriate value indicated by keyword FIXIT.
 
 
 Step 1: Explore Ansible Control Machine
@@ -103,8 +102,11 @@ Section 2: NX-API CLI/REST
 [Task 5] Access Postman client to make REST query to the switch
 
 
+
 Section 3: Day 2 - Automate Monitoring
+
 Introduction 
+
 Cisco NX-OS provides several different mechanisms like SNMP, CLI, XML for collecting data from a network. These mechanisms have limitations which restrict automation and scalability. One of them is the use of the pull model, where the initial request for data from network elements originates from the client. To initiate such requests, continual intervention or the presence of a Network Management System (NMS) is required. Another scalability problem arises when there is more than one NMS in the network.  It is only just a few common barriers which Networking engineers come through.  
 
 A push model, on the other hand, continuously streams data of interest out of the network, which ultimately provides real or near real-time access to monitoring data. 
@@ -125,6 +127,7 @@ Objective
 •	Use pre-build docker containers to deploy telemetry. 
 
 •	At the end of this session, the Nexus 9000v instances should be able to send telemetry data which visualized with Kibana.
+
 
 
 Section 3: Day 2 - Automate Monitoring
@@ -194,13 +197,14 @@ o	final - completed lab exercises: /home/ansible/lab-files/DayN-Automate-Mainten
 
 o	challenges - solved challenges: /home/ansible/lab-files/DayN-Automate-Maintenance/challenges
 
-•	The playbook in some tasks is left incomplete denoted by <INCOMPLETE> for completion or have to be replaced with an appropriate value indicated by keyword FIXIT.
+•	The playbook in some tasks is left incomplete denoted by INCOMPLETE for completion or have to be replaced with an appropriate value indicated by keyword FIXIT.
   
 References:
 
 For more details about GIR check: 
 
 https://www.cisco.com/c/en/us/products/collateral/switches/nexus-9000-series-switches/white-paper-c11-737899.html
+
 
 
 Section 4: Day N - Automate Maintenance	
