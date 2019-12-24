@@ -16,18 +16,31 @@ Section 1: Day 1 - Automate Configuration
 
 Objective 
 •	Explore the Ansible Control Machine. Ansible version 2.7.2 is pre-installed.
+
 o	Inventory file (path = /etc/ansible/hosts)
+
 o	Group Variables (path = /etc/ansible/group_vars)
+
 o	Config file (path = /etc/ansible/ansible.cfg) 
+
 o	Playbooks (path = /home/ansible/lab-files/Day1-Automate-Configuration/tasks)
+
 o	Ansible Documentation (ansible-doc [-l|-s] [options] [-t <plugin type] [plugin]) 
+
 •	Use Ansible NX-OS network modules to configure Nexus 9000v instances in a VPC domain and related topology using NX-API and SSH based connection plugins.
+
 •	At the end of this session, the servers should be able to communicate with each other over Eth1 interface.
+
 •	The files under this section are located in the following folders in designated path:
+
 o	tasks - lab exercises: /home/ansible/lab-files/Day1-Automate-Configuration/tasks
+
 o	final - completed lab exercises: /home/ansible/lab-files/Day1-Automate-Configuration/final
+
 o	challenges - solved challenges: /home/ansible/lab-files/Day1-Automate-Configuration/challenges
+
 •	The playbook in some tasks is left incomplete denoted by <INCOMPLETE> for completion or have to be replaced with an appropriate value indicated by keyword FIXIT.
+
 
 
 Step 1: Explore Ansible Control Machine
