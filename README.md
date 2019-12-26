@@ -1,7 +1,19 @@
 # NetDevOps
 LTRDCN-1074 Cisco Live 2019 Barcelona
 
+To Run Ansible Environment presented in the session, run the docker container:
+
+docker pull deyadav/centos7-ansible2.7.2:v1
+
+docker run -i -t deyadav/centos7-ansible2.7.2:v1 /bin/bash
+
+Now you should be inside the bash of Centos with Ansible 2.7.2 installed along with required Inventory and playbooks.
+
+Day 2 Automate Monitoring, ELK stack setup would require installation including docker engine.
+
+
 WARNING:
+
 "These scripts are meant for educational/proof of concept purposes only - as demonstrated at Cisco Live. Any use of these scripts and tools is at your own risk. There is no guarantee that they have been through thorough testing in a comparable environment and I am not responsible for any damage or data loss incurred as a result of their use."
 
 Bringing the lab exercises prepared for clients during Cisco Live 2019 Barcelona Instructor Led lab.
@@ -224,3 +236,7 @@ Section 4: Day N - Automate Maintenance
 
 [Challenge 8]	
 
+
+
+Disclaimer:
+SMU’s (for NXOS patching) are available for security advisories or high severity issues that don’t have a fixed maintenance release or acceptable workaround of the same train where the patch is requested.
