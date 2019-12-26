@@ -1,6 +1,10 @@
 # NetDevOps
 LTRDCN-1074 Cisco Live 2019 Barcelona
 
+
+Install Docker Engine:
+https://docs.docker.com/install/
+
 To Run Ansible Environment presented in the session, run the docker container:
 
 docker pull deyadav/centos7-ansible2.7.2:v1
